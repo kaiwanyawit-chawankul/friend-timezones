@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://momentjs.com/downloads/moment-with-locales.js"></script>
+<script src="https://momentjs.com/downloads/moment-timezone-with-data.js"></script>
+<body>
+
+<h2>Friend Timezone</h2>
+
+<div id="app">
+  <ul>
+    <li v-for="x in friends">
+      <timer :friend="x" :time="time"></timer>
+      <button @click="removeFriend(x)">x</button>
+    </li>
+  </ul>
+
+  <p>
+    <input v-model="newFriendName">
+    <select v-model="newFriendTimeZone">
+        <!-- inline object literal -->
+        <option v-for="tz in timeZones" v-bind:value="tz">{{tz}}</option>
+      </select>
+    <button @click="addFriend">Add Friend</button>
+  </p>
+</div>
+
+<script>
+
+let Timer = {
+	template: `
+		 <div class="timer">{{ friend.name }} [{{ friend.timezone }}] {{ calculate(friend.timezone) }} <span hidden>{{ time }}</span></div>
+	`,
+	props:['friend','time'],
+	methods: {
+        calculate : function(value) {
+			  return moment.tz(value).format('hh:mm:ss A');
+		 }
+	}
+}
+
+app = new Vue({
+  el: '#app',
+  components: {
+		 'timer':Timer
+	},
+  data: {
+    isRunning: false,
+    time:0,
+	timer:null,
+    newFriendName:null,
+    newFriendTimeZone:null,
+    timeZones:moment.tz.names(),
+    friends: [],
+    sound:new Audio("http://s1download-universal-soundbank.com/wav/nudge.wav")
+  },
+  mounted() {
+    if (localStorage.getItem('friends')) {
+      try {
+        this.friends = JSON.parse(localStorage.getItem('friends'));
+      } catch(e) {
+        localStorage.removeItem('friends');
+      }
+    }
+  },
+  watch:{
+    friends(newfriends) {
+      if(!newfriends) return;
+
+      //localStorage.friends = newfriends;
+      const parsed =JSON.stringify(newfriends);
+      localStorage.setItem('friends', parsed);
+    }
+  },
+  methods: {
+		 start () {
+			 this.isRunning = true
+			 if (!this.timer) {
+				  this.timer = setInterval( () => {
+                      this.time = Date.now();
+				  }, 1000 )
+			 }
+		 },
+		 stop () {
+			 this.isRunning = false
+			 clearInterval(this.timer)
+			 this.timer = null
+		 },
+		 reset () {
+			  this.stop()
+			  this.time = 0
+			  this.secondes = 0
+			  this.minutes = 0
+		 },
+		 setTime (payload) {
+			 this.time = (payload.minutes * 60 + payload.secondes)
+		 },
+         setTime (payload) {
+			 this.time = (payload.minutes * 60 + payload.secondes)
+		 },
+         addFriend() {
+
+            // ensure they actually typed something
+            if (!this.newFriendName && !this.newFriendiTmeZone) {
+                return;
+            }
+
+            let newFriend = {name:this.newFriendName,timezone:this.newFriendTimeZone};
+
+            this.friends.push(newFriend);
+            this.saveFriends();
+
+            this.newFriendName = null;
+            this.newFriendTimeZone = null;
+        },
+        removeFriend(x) {
+            this.friends.splice(this.friends.indexOf(x), 1);
+            this.saveFriends();
+        },
+        saveFriends() {
+            if(!this.friends) return;
+            const parsed =JSON.stringify(this.friends);
+            localStorage.setItem('friends', parsed);
+        },
+        populateFriends() {
+            this.friends = [
+                { name: 'Job', timezone: 'Asia/Bangkok' },
+                { name: 'Genki', timezone: 'Asia/Tokyo' },
+                { name: 'Jaani', timezone: 'Australia/Sydney' },
+                { name: 'Chris', timezone: 'Asia/Singapore' },
+            ];
+        }
+    }
+})
+
+app.start();
+
+</script>
+
+</body>
+</html>
