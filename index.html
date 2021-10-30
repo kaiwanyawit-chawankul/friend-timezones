@@ -66,8 +66,6 @@ app = new Vue({
   watch:{
     friends(newfriends) {
       if(!newfriends) return;
-
-      //localStorage.friends = newfriends;
       const parsed =JSON.stringify(newfriends);
       localStorage.setItem('friends', parsed);
     }
@@ -80,23 +78,6 @@ app = new Vue({
                       this.time = Date.now();
 				  }, 1000 )
 			 }
-		 },
-		 stop () {
-			 this.isRunning = false
-			 clearInterval(this.timer)
-			 this.timer = null
-		 },
-		 reset () {
-			  this.stop()
-			  this.time = 0
-			  this.secondes = 0
-			  this.minutes = 0
-		 },
-		 setTime (payload) {
-			 this.time = (payload.minutes * 60 + payload.secondes)
-		 },
-         setTime (payload) {
-			 this.time = (payload.minutes * 60 + payload.secondes)
 		 },
          addFriend() {
 
@@ -121,14 +102,6 @@ app = new Vue({
             if(!this.friends) return;
             const parsed =JSON.stringify(this.friends);
             localStorage.setItem('friends', parsed);
-        },
-        populateFriends() {
-            this.friends = [
-                { name: 'Job', timezone: 'Asia/Bangkok' },
-                { name: 'Genki', timezone: 'Asia/Tokyo' },
-                { name: 'Jaani', timezone: 'Australia/Sydney' },
-                { name: 'Chris', timezone: 'Asia/Singapore' },
-            ];
         }
     }
 })
