@@ -14,6 +14,7 @@ namespace FriendTimeZonesWasm
     {
         public static async Task Main(string[] args)
         {
+            //var servcei = new TimeZoneService();
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
